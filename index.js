@@ -1,0 +1,1 @@
+const chain = require('simpleChain');
