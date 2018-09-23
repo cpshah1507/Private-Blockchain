@@ -158,42 +158,40 @@ class Blockchain{
 
   // Validate blockchain
   validateChain(){
-
-    // TODO Work in progress
     let errorLog = [];
-    let promises = [];
-
+    let validatePromises = [];
+    let blockPromises = [];
     this.getBlockHeight().then((height) => {
-      console.log(height);
-      for (var ind = 0; ind < height; ind++) {
-        // validate block
-        let validateBlockPromise = this.validateBlock(ind).then((blockValid) => {
-          if(!blockValid)
-            errorLog.push(ind);
-        });
-        promises.push(validateBlockPromise);
 
-        // compare blocks hash link
-        let hashComparePromise = this.getBlock(ind).then((block)=> {
-          console.log("ind is: " + ind);
-          this.getBlock(ind+1).then((nextBlock) => {
-            if(block.hash !== nextBlock.previousHash)
-            {
-              errorLog.push(ind);
-            }
-          });
-        });
-        
-        promises.push(hashComparePromise);        
+      for (var ind = 0; ind <= height; ind++) {
+        validatePromises.push(this.validateBlock(ind));
+        blockPromises.push(this.getBlock(ind));
       }
 
-      Promise.all(promises).then((results) => {
-        if (errorLog.length>0) {
-          console.log('Block errors = ' + errorLog.length);
-          console.log('Blocks: '+errorLog);
-        } else {
-          console.log('No errors detected');
+      Promise.all(validatePromises).then((results) => {
+        for(var i = 0; i < results.length;i++)
+        {
+          if(!results[i])
+            errorLog.push(i);
         }
+
+        Promise.all(blockPromises).then((blocks) => {
+          // compare blocks hash link
+          for(var j = 0;j < blocks.length-1;j++)
+          {
+            if(blocks[j].hash !== blocks[j+1].previousBlockHash)
+            {
+              errorLog.push(j);
+            }
+          }
+
+          if (errorLog.length>0) {
+            console.log('Block errors = ' + errorLog.length);
+            console.log('Blocks: '+errorLog);
+          } else {
+            console.log('No errors detected');
+          }
+        });
       });
     });
   }
