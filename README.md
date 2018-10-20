@@ -1,8 +1,5 @@
 # Private-Blockchain
 
-
-# Private-Blockchain
-
 RESTful Web API with Simple Prototype of Private Blockchain using LevelDB
 
 ## Node.js Framework
