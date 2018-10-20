@@ -13,7 +13,8 @@ const port = 8000;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//app.get('/', (req, res) => res.send('Hello World!'));
+// Default home page
+app.get('/', (req, res) => res.send('Server for RESTful Web API!'));
 
 // GET Request to get Block by Height
 app.get('/block/:blockid', function (req, res) {
@@ -27,21 +28,6 @@ app.get('/block/:blockid', function (req, res) {
   	res.send("Error in getting block data - block with that height does not exist");
   });
   
-});
-
-// GET Request to get Block Form (used for testing POST request)
-app.get('/blockForm', function (req, res) {
-  	res.send(`
-        <!doctype html>
-        <html>
-        <body>
-            <form action="/" method="post">
-                <input type="text" name="body" /><br />
-                <button>Save</button>
-            </form>
-        </body>
-        </html>
-    `);
 });
 
 // POST Request to add block to blockchain
@@ -71,5 +57,20 @@ app.post('/', function (req, res) {
 	});
   }
 })
+
+// GET Request to get Block Form (used for testing POST request)
+app.get('/blockForm', function (req, res) {
+  	res.send(`
+        <!doctype html>
+        <html>
+        <body>
+            <form action="/" method="post">
+                <input type="text" name="body" /><br />
+                <button>Save</button>
+            </form>
+        </body>
+        </html>
+    `);
+});
 
 app.listen(port, () => console.log(`Express app listening on port ${port}!`));
