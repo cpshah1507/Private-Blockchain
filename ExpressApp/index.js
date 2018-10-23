@@ -31,7 +31,7 @@ app.get('/block/:blockid', function (req, res) {
 });
 
 // POST Request to add block to blockchain
-app.post('/', function (req, res) {
+app.post('/block', function (req, res) {
 
   if(req.body.body == null || req.body.body == "")
   {
