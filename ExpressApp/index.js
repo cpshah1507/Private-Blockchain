@@ -1,7 +1,10 @@
 // Creating and adding blocks defined in Private Blockchain (From Project 2)
 let Blockchain = require('./simpleChain.js');
 let Block = require('./Block');
+let Mempool = require('./Mempool.js');
+
 let myBlockChain = new Blockchain();
+let myMempool = new Mempool();
 
 // Defining and starting Express Framework
 const express = require('express');
@@ -71,6 +74,25 @@ app.get('/blockForm', function (req, res) {
         </body>
         </html>
     `);
+});
+
+// POST Request to validate user
+app.post('/api/requestValidation', function (req, res) {
+
+  if(req.body.address == null || req.body.address == "")
+  {
+    console.log('address param not found');
+    res.send('Address parameter not valid in POST Request.');
+  }
+  else
+  {
+    //let Mempool_Request = {};
+    //Mempool_Request['walletAddress'] = req.body.address; 
+    //Mempool_Request['requestTimeStamp'] = (new Date().getTime().toString().slice(0,-3));
+    let requestObject = myMempool.addRequestValidation(req.body.address);
+    res.setHeader("Content-Type", "application/json");
+		res.send(requestObject);
+  }
 });
 
 app.listen(port, () => console.log(`Express app listening on port ${port}!`));
