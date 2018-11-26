@@ -77,8 +77,8 @@ app.get('/blockForm', function (req, res) {
 });
 
 // POST Request to validate user
-app.post('/api/requestValidation', function (req, res) {
-
+app.post('/requestValidation', function (req, res)
+{
   if(req.body.address == null || req.body.address == "")
   {
     console.log('address param not found');
@@ -86,13 +86,32 @@ app.post('/api/requestValidation', function (req, res) {
   }
   else
   {
-    //let Mempool_Request = {};
-    //Mempool_Request['walletAddress'] = req.body.address; 
-    //Mempool_Request['requestTimeStamp'] = (new Date().getTime().toString().slice(0,-3));
     let requestObject = myMempool.addRequestValidation(req.body.address);
     res.setHeader("Content-Type", "application/json");
 		res.send(requestObject);
   }
 });
+
+// POST request to validate message signature
+app.post('/message-signature/validate', function (req, res)
+{
+  if(req.body.address == null || req.body.address == "")
+  {
+    console.log('Address param not found');
+    res.send('Address parameter not valid in POST Request.');
+  }
+  else if(req.body.signature == null || req.body.signature == "")
+  {
+    console.log('Signature param not found');
+    res.send('Signature parameter not valid in POST Request.');
+  }
+  else
+  {
+    let validRequestObject = myMempool.validateRequestByWallet(req.body.address,req.body.signature);
+    res.setHeader("Content-Type", "application/json");
+		res.send(validRequestObject);
+  }
+});
+
 
 app.listen(port, () => console.log(`Express app listening on port ${port}!`));
