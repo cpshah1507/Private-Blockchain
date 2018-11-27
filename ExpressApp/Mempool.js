@@ -104,6 +104,18 @@ class Mempool {
         if(address in this.timeoutMempoolValid)
             delete this.timeoutMempoolValid[address];
    }
+
+   verifyAddressRequest(address)
+   {
+       if(address in this.mempoolValid && this.mempoolValid[address].status.messageSignature)
+       {
+           return true;
+       }
+       else
+       {
+           return false;
+       }
+   }
 }
 
 

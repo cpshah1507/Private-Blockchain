@@ -134,6 +134,26 @@ class Blockchain{
     });
   }
 
+  // get block by hash
+  getBlockByHash(hash) {
+    let self = this;
+    let block = null;
+    return new Promise(function(resolve, reject){
+        self.db.createReadStream()
+        .on('data', function (data) {
+            if(data.hash === hash){
+                block = data;
+            }
+        })
+        .on('error', function (err) {
+            reject(err)
+        })
+        .on('close', function () {
+            resolve(block);
+        });
+    });
+  }
+
   // validate block
   validateBlock(blockHeight){
     return new Promise((resolve, reject) => {

@@ -33,31 +33,90 @@ app.get('/block/:blockid', function (req, res) {
   
 });
 
+// GET Request to get star Block by Height
+app.get('/stars/hash:blockhash', function (req, res) {
+
+  var blockhash = req.params["blockhash"];
+
+  myBlockChain.getBlockByHash(blockhash).then(function(data)
+  {
+    data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(data);
+  },function(err){
+  	res.send("Error in getting block data - block with that height does not exist");
+  });
+  
+});
+
 // POST Request to add block to blockchain
 app.post('/block', function (req, res) {
 
-  if(req.body.body == null || req.body.body == "")
+  if(req.body == null || req.body == "")
   {
-  	console.log('block body param not found');
-  	res.send('Block body parameter not valid in POST Request. Could not create block');
+  	console.log('block body params not found');
+  	res.send('Block body parameters not valid in POST Request. Could not create block');
   }
   else
   {
-	let blockToAdd = new Block(req.body.body);
-	myBlockChain.addBlock(blockToAdd).then((result) =>
-	{
-	    console.log("Block added with height: " + result);
-	    myBlockChain.getBlock(result).then(function(data)
-	    {
-		  	res.setHeader("Content-Type", "application/json");
-		  	res.send(data);
-		}, function(err)
-		{
-		  	res.send("Error in getting block data - block with that height does not exist");
-		});
-	}, (err) => {
-		console.log(err);
-	});
+    let starStory = req.body.star.story;
+
+    // validation for story of star
+    if(starStory.split(" ").length > 250)
+    {
+      console.log('Star story too long.');
+  	  res.send('Star story exceeds 250 words in POST Request. Could not create block');
+    }
+
+    // validation to make sure only one star story is there per request
+    if(Array.isArray(req.body.star))
+    {
+      console.log('Star param is an array.');
+  	  res.send('Star param is an array in POST Request. Could not create block');
+    }
+
+    // verify that request validation exists and is verified
+    let verified = verifyAddressRequest(req.body.address);
+    if(!verified)
+    {
+      console.log('Request validation does not exist or is not verified.');
+  	  res.send('Request validation does not exist or is not verified. Could not create block');
+    }
+
+    if(typeof req.body.star.mag == "undefined")
+      req.body.star['mag'] = "";
+
+    if(typeof req.body.star.cen == "undefined")
+      req.body.star['cen'] = "";
+
+    let BodyForBlockToAdd = {
+      address: req.body.address,
+      star: {
+        ra: req.body.star.ra,
+        dec: req.body.star.dec,
+        mag: req.body.star.mag,
+        cen: req.body.star.cen,
+        story: Buffer(starStory).toString('hex')
+      }
+    };
+
+    let blockToAdd = new Block(BodyForBlockToAdd);
+    myBlockChain.addBlock(blockToAdd).then((result) =>
+    {
+        console.log("Block added with height: " + result);
+        myBlockChain.getBlock(result).then(function(data)
+        {
+          data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
+          res.setHeader("Content-Type", "application/json");
+          res.send(data);
+      }, function(err)
+      {
+          res.send("Error in getting block data - block with that height does not exist");
+      });
+    }, (err) => {
+      console.log(err);
+      res.send("Error in adding block data");
+    });
   }
 })
 
