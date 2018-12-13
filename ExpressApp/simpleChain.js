@@ -135,8 +135,7 @@ class Blockchain{
   }
 
   // get block by hash
-  getBlockByHash(hash) {
-    let self = this;
+  getBlockByHash(hash) {    
     let block = null;
     return new Promise(function(resolve, reject){
         db.createReadStream()
@@ -151,6 +150,26 @@ class Blockchain{
         })
         .on('close', function () {
             resolve(block);
+        });
+    });
+  }
+
+  // get block by wallet address
+  getBlockByWalletAddress(walletAddress) {
+    let blocks = [];
+    return new Promise(function(resolve, reject){
+        db.createReadStream()
+        .on('data', function (data) {
+            var blockData = JSON.parse(data.value);
+            if(blockData.body.address == walletAddress){
+              blocks.push(blockData);
+            }
+        })
+        .on('error', function (err) {
+            reject(err)
+        })
+        .on('close', function () {
+            resolve(blocks);
         });
     });
   }

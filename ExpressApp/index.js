@@ -37,7 +37,6 @@ app.get('/block/:blockid', function (req, res) {
 
 // GET Request to get star Block by Height
 app.get('/stars/hash::blockhash', function (req, res) {
-
   var blockhash = req.params["blockhash"];
 
   myBlockChain.getBlockByHash(blockhash).then(function(data)
@@ -47,8 +46,25 @@ app.get('/stars/hash::blockhash', function (req, res) {
   	res.send(data);
   },function(err){
   	res.send("Error in getting block data - block with that height does not exist");
+  });  
+});
+
+// GET Request to get star Block by Address
+app.get('/stars/address::blockaddress', function (req, res) {
+  var blockaddress = req.params["blockaddress"];
+
+  myBlockChain.getBlockByWalletAddress(blockaddress).then(function(data)
+  {
+    for(var i = 0; i < data.length;i++)
+    {
+      data[i].body.star['storyDecoded'] = hex2ascii(data[i].body.star.story);
+    }
+    
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(data);
+  },function(err){
+  	res.send("Error in getting block data - block with that height does not exist");
   });
-  
 });
 
 // POST Request to add block to blockchain
