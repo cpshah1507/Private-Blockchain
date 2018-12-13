@@ -139,10 +139,11 @@ class Blockchain{
     let self = this;
     let block = null;
     return new Promise(function(resolve, reject){
-        self.db.createReadStream()
+        db.createReadStream()
         .on('data', function (data) {
-            if(data.hash === hash){
-                block = data;
+            var blockData = JSON.parse(data.value);
+            if(blockData.hash == hash){
+                block = blockData;
             }
         })
         .on('error', function (err) {

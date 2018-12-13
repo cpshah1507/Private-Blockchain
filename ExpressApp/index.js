@@ -36,7 +36,7 @@ app.get('/block/:blockid', function (req, res) {
 });
 
 // GET Request to get star Block by Height
-app.get('/stars/hash:blockhash', function (req, res) {
+app.get('/stars/hash::blockhash', function (req, res) {
 
   var blockhash = req.params["blockhash"];
 
