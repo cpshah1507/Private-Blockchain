@@ -39,9 +39,10 @@ class Mempool {
    validateRequestByWallet(walletAddress, signature)
    {
         let validRequestObject = {};
+        const TimeoutRequestsWindowTime = 5*60*1000;
         if(walletAddress in this.mempool)
         {
-            requestObject = this.mempool[walletAddress];
+            let requestObject = this.mempool[walletAddress];
 
             // Verify window time
             let timeElapse = (new Date().getTime().toString().slice(0,-3)) - requestObject.requestTimeStamp;
@@ -50,7 +51,7 @@ class Mempool {
             {
                 // Verify the signature
                 let isValid = bitcoinMessage.verify(requestObject.message, walletAddress, signature);
-
+                
                 if(isValid)
                 {
                     if(walletAddress in this.mempoolValid)
@@ -82,8 +83,8 @@ class Mempool {
                         this.mempoolValid[walletAddress] = validRequestObject;
 
                         // Clean up timeout array
-                        if(address in this.timeoutRequests)
-                            delete this.timeoutRequests[address];
+                        if(walletAddress in this.timeoutRequests)
+                            delete this.timeoutRequests[walletAddress];
                     }
                 }
             }

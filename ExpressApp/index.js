@@ -8,7 +8,9 @@ let myMempool = new Mempool();
 
 // Defining and starting Express Framework
 const express = require('express');
+const hex2ascii = require('hex2ascii');
 var bodyParser = require("body-parser");
+
 const app = express();
 const port = 8000;
 
@@ -52,7 +54,7 @@ app.get('/stars/hash:blockhash', function (req, res) {
 // POST Request to add block to blockchain
 app.post('/block', function (req, res) {
 
-  if(req.body == null || req.body == "")
+  if(req.body == null || req.body == "" || req.body.star == null)
   {
   	console.log('block body params not found');
   	res.send('Block body parameters not valid in POST Request. Could not create block');
@@ -62,10 +64,10 @@ app.post('/block', function (req, res) {
     let starStory = req.body.star.story;
 
     // validation for story of star
-    if(starStory.split(" ").length > 250)
+    if(starStory === undefined || starStory.split(" ").length > 250)
     {
-      console.log('Star story too long.');
-  	  res.send('Star story exceeds 250 words in POST Request. Could not create block');
+      console.log('Star story undefined or too long.');
+  	  res.send('Star story invalid or exceeds 250 words in POST Request. Could not create block');
     }
 
     // validation to make sure only one star story is there per request
@@ -76,7 +78,7 @@ app.post('/block', function (req, res) {
     }
 
     // verify that request validation exists and is verified
-    let verified = verifyAddressRequest(req.body.address);
+    let verified = myMempool.verifyAddressRequest(req.body.address);
     if(!verified)
     {
       console.log('Request validation does not exist or is not verified.');
