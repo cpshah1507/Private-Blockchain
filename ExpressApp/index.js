@@ -41,11 +41,18 @@ app.get('/stars/hash::blockhash', function (req, res) {
 
   myBlockChain.getBlockByHash(blockhash).then(function(data)
   {
-    data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
-  	res.setHeader("Content-Type", "application/json");
-  	res.send(data);
+    if(data == null)
+    {
+      res.send("Error in getting block data - block with that hash does not exist");
+    }
+    else
+    {
+      data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
+      res.setHeader("Content-Type", "application/json");
+      res.send(data);
+    }
   },function(err){
-  	res.send("Error in getting block data - block with that height does not exist");
+  	res.send("Error in getting block data - block with that hash does not exist");
   });  
 });
 
@@ -55,6 +62,10 @@ app.get('/stars/address::blockaddress', function (req, res) {
 
   myBlockChain.getBlockByWalletAddress(blockaddress).then(function(data)
   {
+    if(data.length == 0)
+    {
+      res.send("Error in getting block data - block with that address does not exist");
+    }
     for(var i = 0; i < data.length;i++)
     {
       data[i].body.star['storyDecoded'] = hex2ascii(data[i].body.star.story);
@@ -62,7 +73,7 @@ app.get('/stars/address::blockaddress', function (req, res) {
   	res.setHeader("Content-Type", "application/json");
   	res.send(data);
   },function(err){
-  	res.send("Error in getting block data - block with that height does not exist");
+  	res.send("Error in getting block data - block with that address does not exist");
   });
 });
 
@@ -136,7 +147,7 @@ app.post('/block', function (req, res) {
     {
         // Remove verified request from mempool
         myMempool.removeVerifiedRequest(req.body.address);
-        
+
         console.log("Block added with height: " + result);
         myBlockChain.getBlock(result).then(function(data)
         {
