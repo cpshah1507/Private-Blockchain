@@ -102,8 +102,11 @@ class Mempool {
 
    removeVerifiedRequest(address)
    {
+        this.removeValidationRequest(address);
         if(address in this.timeoutMempoolValid)
             delete this.timeoutMempoolValid[address];
+        if(address in this.mempoolValid)
+            delete this.mempoolValid[address];
    }
 
    verifyAddressRequest(address)

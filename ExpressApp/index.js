@@ -21,18 +21,34 @@ app.use(bodyParser.json());
 // Default home page
 app.get('/', (req, res) => res.send('Server for RESTful Web API!'));
 
+// Custom error handler
+function handleError(errMsg, res)
+{
+  var errorResponse = {"status":400, "message": errMsg}
+  res.setHeader("Content-Type", "application/json");
+  res.status(400).send(errorResponse);
+}
+
+// Helper function to check if element is undefined or empty
+function isEmpty(v) {
+  if (v == null || v == undefined || v == "") {
+    return true;
+  }
+  return false;
+}
+
 // GET Request to get Block by Height
 app.get('/block/:blockid', function (req, res) {
   var blockID = req.params["blockid"];
 
   myBlockChain.getBlock(blockID).then(function(data){
     // validation for genesis block
-    if(data.body.star != undefined)
+    if(isEmpty(data.body.star))
       data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
     res.setHeader("Content-Type", "application/json");
   	res.send(data);
   },function(err){
-  	res.send("Error in getting block data - block with that height does not exist");
+    handleError("Block with that height does not exist",res);
   });  
 });
 
@@ -42,9 +58,9 @@ app.get('/stars/hash::blockhash', function (req, res) {
 
   myBlockChain.getBlockByHash(blockhash).then(function(data)
   {
-    if(data == null)
+    if(isEmpty(data))
     {
-      res.send("Error in getting block data - block with that hash does not exist");
+      handleError("Error in getting block data - block with that hash does not exist",res);
     }
     else
     {
@@ -53,7 +69,7 @@ app.get('/stars/hash::blockhash', function (req, res) {
       res.send(data);
     }
   },function(err){
-  	res.send("Error in getting block data - block with that hash does not exist");
+    handleError("Error in getting block data - block with that hash does not exist",res);
   });  
 });
 
@@ -65,7 +81,7 @@ app.get('/stars/address::blockaddress', function (req, res) {
   {
     if(data.length == 0)
     {
-      res.send("Error in getting block data - block with that address does not exist");
+      handleError("Error in getting block data - block with that address does not exist",res);
     }
     for(var i = 0; i < data.length;i++)
     {
@@ -74,34 +90,34 @@ app.get('/stars/address::blockaddress', function (req, res) {
   	res.setHeader("Content-Type", "application/json");
   	res.send(data);
   },function(err){
-  	res.send("Error in getting block data - block with that address does not exist");
+  	handleError("Error in getting block data - block with that address does not exist",res);
   });
 });
 
 // POST Request to add block to blockchain
 app.post('/block', function (req, res) {
 
-  if(req.body == null || req.body == "" || req.body.star == null)
+  if(req.body == null || req.body == "" || req.body.star == null || req.body.star.ra == null || req.body.star.dec == null)
   {
-  	console.log('block body params not found');
-  	res.send('Block body parameters not valid in POST Request. Could not create block');
+    console.log('block body params not valid');
+    handleError("Invalid message format for add star request",res);
   }
   else
   {
     let starStory = req.body.star.story;
 
     // validation for story of star
-    if(starStory === undefined || starStory.split(" ").length > 250)
+    if(isEmpty(starStory) || starStory.split(" ").length > 250)
     {
       console.log('Star story undefined or too long.');
-  	  res.send('Star story invalid or exceeds 250 words in POST Request. Could not create block');
+      handleError("Star story invalid or exceeds 250 words in POST Request. Could not create block",res);
     }
 
     // validation to make sure only one star story is there per request
     if(Array.isArray(req.body.star))
     {
       console.log('Star param is an array.');
-  	  res.send('Star param is an array in POST Request. Could not create block');
+      handleError("Star param is an array in POST Request. Could not create block",res);
     }
 
     // verify that request validation exists and is verified
@@ -109,7 +125,7 @@ app.post('/block', function (req, res) {
     if(!verified)
     {
       console.log('Request validation does not exist or is not verified.');
-  	  res.send('Request validation does not exist or is not verified. Could not create block');
+      handleError("Request validation does not exist or is not verified. Could not create block",res);
     }
 
     if(typeof req.body.star.mag == "undefined")
@@ -143,11 +159,11 @@ app.post('/block', function (req, res) {
           res.send(data);
       }, function(err)
       {
-          res.send("Error in getting block data - block with that height does not exist");
+        handleError("Error in getting block data - block with that height does not exist",res);
       });
     }, (err) => {
       console.log(err);
-      res.send("Error in adding block data");
+      handleError("Error in adding block data",res);
     });
   }
 })
@@ -170,10 +186,10 @@ app.get('/blockForm', function (req, res) {
 // POST Request to validate user
 app.post('/requestValidation', function (req, res)
 {
-  if(req.body.address == null || req.body.address == "")
+  if(isEmpty(req.body.address))
   {
     console.log('address param not found');
-    res.send('Address parameter not valid in POST Request.');
+    handleError("Address parameter not valid in POST Request.",res);
   }
   else
   {
@@ -186,15 +202,15 @@ app.post('/requestValidation', function (req, res)
 // POST request to validate message signature
 app.post('/message-signature/validate', function (req, res)
 {
-  if(req.body.address == null || req.body.address == "")
+  if(isEmpty(req.body.address))
   {
     console.log('Address param not found');
-    res.send('Address parameter not valid in POST Request.');
+    handleError("Address parameter not valid in POST Request.",res);
   }
-  else if(req.body.signature == null || req.body.signature == "")
+  else if(isEmpty(req.body.signature))
   {
     console.log('Signature param not found');
-    res.send('Signature parameter not valid in POST Request.');
+    handleError("Signature parameter not valid in POST Request.",res);
   }
   else
   {

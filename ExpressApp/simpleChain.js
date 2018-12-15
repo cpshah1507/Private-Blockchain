@@ -17,18 +17,32 @@ class Blockchain{
     this.getBlockHeight().then((height)=>{
       if(height == -1)
       {
-        let genesis_block = new Block("First block in the chain - Genesis block");
-        genesis_block.height = 0;
-        genesis_block.time = new Date().getTime().toString().slice(0,-3);
-        genesis_block.hash = SHA256(JSON.stringify(genesis_block)).toString();
-        db.put(genesis_block.height,
-        JSON.stringify(genesis_block).toString()).then(
-        function(data){
+        this.addGenesisBlock().then(function(){
           console.log("Genesis Block Added");
         },function(err){
           console.log(err);
         });
       }
+    },function(err){
+      console.log(err);
+    });
+  }
+
+  // Code to add genesis block
+  addGenesisBlock()
+  {
+    return new Promise((resolve,reject) => {
+      let genesis_block = new Block("First block in the chain - Genesis block");
+      genesis_block.height = 0;
+      genesis_block.time = new Date().getTime().toString().slice(0,-3);
+      genesis_block.hash = SHA256(JSON.stringify(genesis_block)).toString();
+      db.put(genesis_block.height,
+      JSON.stringify(genesis_block)).then(
+      function(data){
+        resolve();
+      },function(err){
+        reject(err);
+      });
     });
   }
 
@@ -41,14 +55,11 @@ class Blockchain{
         // Add genesis block if it doesn't exist
         if(height == -1)
         {
-          let genesis_block = new Block("First block in the chain - Genesis block");
-          genesis_block.height = 0;
-          genesis_block.time = new Date().getTime().toString().slice(0,-3);
-          genesis_block.hash = SHA256(JSON.stringify(genesis_block)).toString();
-          db.put(genesis_block.height,
-            JSON.stringify(genesis_block).toString()).then(
-            function(data){
-              console.log("Genesis Block Added");
+          this.addGenesisBlock().then(function()
+          {
+            console.log("Genesis Block Added");
+            this.getBlock(0).then(function(data){
+              var genesis_block = data;
               height = 0;
               // Block height
               newBlock.height = height + 1;
@@ -70,7 +81,12 @@ class Blockchain{
                 });
             },function(err){
               console.log(err);
+              reject(err);
             });
+          },function(err){
+            console.log(err);
+            reject(err);
+          });
         }
         else if(height>=0)
         {
@@ -95,6 +111,9 @@ class Blockchain{
             });
           });
         }
+      },function(err){
+        console.log(err);
+        reject(err);
       });
     });
   }
