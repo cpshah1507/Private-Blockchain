@@ -58,8 +58,21 @@ app.get('/stars/address::blockaddress', function (req, res) {
     for(var i = 0; i < data.length;i++)
     {
       data[i].body.star['storyDecoded'] = hex2ascii(data[i].body.star.story);
-    }
-    
+    }    
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(data);
+  },function(err){
+  	res.send("Error in getting block data - block with that height does not exist");
+  });
+});
+
+// GET Request to get star block by Height
+app.get('/stars/height::height', function (req, res) {
+  var blockheight = req.params["height"];
+
+  myBlockChain.getBlockByHeight(blockheight).then(function(data)
+  {
+    data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
   	res.setHeader("Content-Type", "application/json");
   	res.send(data);
   },function(err){
@@ -121,6 +134,9 @@ app.post('/block', function (req, res) {
     let blockToAdd = new Block(BodyForBlockToAdd);
     myBlockChain.addBlock(blockToAdd).then((result) =>
     {
+        // Remove verified request from mempool
+        myMempool.removeVerifiedRequest(req.body.address);
+        
         console.log("Block added with height: " + result);
         myBlockChain.getBlock(result).then(function(data)
         {

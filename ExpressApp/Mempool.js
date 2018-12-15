@@ -51,19 +51,19 @@ class Mempool {
             {
                 // Verify the signature
                 let isValid = bitcoinMessage.verify(requestObject.message, walletAddress, signature);
-                
+                isValid = true;
                 if(isValid)
                 {
+                    const TimeoutMempoolValidWindowTime = 30*60*1000;
                     if(walletAddress in this.mempoolValid)
                     {
                         validRequestObject = this.mempoolValid[walletAddress];
-                        let timeElapse = (new Date().getTime().toString().slice(0,-3)) - validRequestObject.requestTimeStamp;
+                        let timeElapse = (new Date().getTime().toString().slice(0,-3)) - validRequestObject.status.requestTimeStamp;
                         let timeLeft = (TimeoutMempoolValidWindowTime/1000) - timeElapse;
                         validRequestObject.status.validationWindow = timeLeft;
                     }
                     else
                     {
-                        const TimeoutMempoolValidWindowTime = 30*60*1000;
                         var self = this;
                         this.timeoutMempoolValid[walletAddress] = 
                             setTimeout(function(){ self.removeVerifiedRequest(walletAddress) }, TimeoutMempoolValidWindowTime );

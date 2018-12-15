@@ -174,6 +174,25 @@ class Blockchain{
     });
   }
 
+  // get block by block height
+  getBlockByHeight(height) {
+    return new Promise(function(resolve, reject) {
+        db.get(height, (err, value) => {
+            if(err){
+                if (err.type == 'NotFoundError') {
+                    resolve(undefined);
+                }else {
+                    console.log('Block ' + key + ' get failed', err);
+                    reject(err);
+                }
+            }else {
+                var json_data = JSON.parse(value);
+                resolve(json_data);
+            }
+        });
+    });
+  }
+
   // validate block
   validateBlock(blockHeight){
     return new Promise((resolve, reject) => {
