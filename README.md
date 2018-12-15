@@ -1,7 +1,7 @@
 # Private-Blockchain Notary Service
 
-A Star Registry Service that allows users to claim ownership of their favorite star in the night sky with RESTful Web API.
-Project uses a Prototype of Private Blockchain using LevelDB.
+A Star Registry Service that allows users to claim ownership of their favorite star in the night sky with RESTful Web API.  
+Project uses a Prototype of Private Blockchain using LevelDB.  
 A mempool component of project will store validation requests from user to register a star.
 
 ## Node.js Framework
@@ -17,7 +17,7 @@ This project uses express.js framework for servicing endpoints.
 
 ### Endpoints
 
-- Request validation
+- Request validation  
 Example:  
 POST URL: http://localhost:8000/requestValidation  
 This URL will return validation request object with validation time window.  
@@ -28,7 +28,7 @@ POST request body:
 }
 ```
 
-- Validate message signature
+- Validate message signature  
 Example:  
 POST URL: http://localhost:8000/message-signature/validate  
 Server will verify the signature sent by the user and authorize user to register a star.  
@@ -40,7 +40,7 @@ POST request body:
 }
 ```
 
-- Add star to Star Notary Blockchain
+- Add star to Star Notary Blockchain  
 Example:  
 POST URL: http://localhost:8000/block  
 Server will add registered star block to private blockchain after encoding star story.  
@@ -56,14 +56,14 @@ POST request body:
 }
 ```
 
-- Get a star by hash
+- Get a star by hash  
 Example:  
 URL: http://localhost:8000/stars/hash:3b74de04ed5ea0f9614096d571a809e54de1aa526610577429eab65642711234
 
-- Get star(s) by wallet address
+- Get star(s) by wallet address  
 Example:  
 URL: http://localhost:8000/stars/address:19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL
 
-- Get a star by block-height
+- Get a star by block-height  
 Example:  
 URL: http://localhost:8000/stars/height:1
