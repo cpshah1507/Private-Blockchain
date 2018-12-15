@@ -97,7 +97,7 @@ app.get('/stars/address::blockaddress', function (req, res) {
 // POST Request to add block to blockchain
 app.post('/block', function (req, res) {
 
-  if(req.body == null || req.body == "" || req.body.star == null || req.body.star.ra == null || req.body.star.dec == null)
+  if(isEmpty(req.body) ||  isEmpty(req.body.star) || isEmpty(req.body.ra) || isEmpty(req.body.dec))
   {
     console.log('block body params not valid');
     handleError("Invalid message format for add star request",res);
