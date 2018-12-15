@@ -24,7 +24,7 @@ class Blockchain{
         db.put(genesis_block.height,
         JSON.stringify(genesis_block).toString()).then(
         function(data){
-          console.log("Block Added");
+          console.log("Genesis Block Added");
         },function(err){
           console.log(err);
         });
@@ -170,25 +170,6 @@ class Blockchain{
         })
         .on('close', function () {
             resolve(blocks);
-        });
-    });
-  }
-
-  // get block by block height
-  getBlockByHeight(height) {
-    return new Promise(function(resolve, reject) {
-        db.get(height, (err, value) => {
-            if(err){
-                if (err.type == 'NotFoundError') {
-                    resolve(undefined);
-                }else {
-                    console.log('Block ' + key + ' get failed', err);
-                    reject(err);
-                }
-            }else {
-                var json_data = JSON.parse(value);
-                resolve(json_data);
-            }
         });
     });
   }

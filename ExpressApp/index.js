@@ -23,16 +23,17 @@ app.get('/', (req, res) => res.send('Server for RESTful Web API!'));
 
 // GET Request to get Block by Height
 app.get('/block/:blockid', function (req, res) {
-
   var blockID = req.params["blockid"];
 
   myBlockChain.getBlock(blockID).then(function(data){
-  	res.setHeader("Content-Type", "application/json");
+    // validation for genesis block
+    if(data.body.star != undefined)
+      data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
+    res.setHeader("Content-Type", "application/json");
   	res.send(data);
   },function(err){
   	res.send("Error in getting block data - block with that height does not exist");
-  });
-  
+  });  
 });
 
 // GET Request to get star Block by Height
@@ -74,20 +75,6 @@ app.get('/stars/address::blockaddress', function (req, res) {
   	res.send(data);
   },function(err){
   	res.send("Error in getting block data - block with that address does not exist");
-  });
-});
-
-// GET Request to get star block by Height
-app.get('/stars/height::height', function (req, res) {
-  var blockheight = req.params["height"];
-
-  myBlockChain.getBlockByHeight(blockheight).then(function(data)
-  {
-    data.body.star['storyDecoded'] = hex2ascii(data.body.star.story);
-  	res.setHeader("Content-Type", "application/json");
-  	res.send(data);
-  },function(err){
-  	res.send("Error in getting block data - block with that height does not exist");
   });
 });
 

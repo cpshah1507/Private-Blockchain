@@ -66,4 +66,4 @@ URL: http://localhost:8000/stars/address:19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL
 
 - Get a star by block-height  
 Example:  
-URL: http://localhost:8000/stars/height:1
+URL: http://localhost:8000/block/1
