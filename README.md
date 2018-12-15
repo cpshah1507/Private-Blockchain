@@ -16,7 +16,7 @@ This project uses node js server and express.js framework for servicing endpoint
 
 ### Installing
 
-Install latest node js server along with npm (https://nodejs.org/en/download/)
+Install latest node js server along with npm (https://nodejs.org/en/download/)  
 Clone repository and go to the ExpressApp directory to run following command from terminal:
 
 ```
@@ -28,7 +28,7 @@ To start server, run following command from terminal:
 npm start
 ```
 
-Server will be running by default on http://localhost:8000
+Server will be running by default on http://localhost:8000  
 If server has started successfully, you can go to that URL in a browser and it should return:
 
 ```
